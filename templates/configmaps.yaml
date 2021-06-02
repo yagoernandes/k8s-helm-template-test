@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  namespace: {{ .Release.Name }}-ns
+data:
+  SEM_USO: {{ .Values.env.SEM_USO }}

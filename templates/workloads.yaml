@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deploy
+  namespace: {{ .Release.Name }}-ns
+spec:
+  replicas: 3
+  template:
+    metadata:
+      name: {{ .Release.Name }}-pod
+      labels:
+        app: {{ .Release.Name }}-pod
+      {{- if .Values.metrics }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '80'
+      {{- end }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}-container
+        image: {{ .Values.image }}:{{ .Values.version }}
+
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+
+        ports:
+        - containerPort: 80
+          name: api-port
+
+        envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-configmap
+
+        livenessProbe:
+          httpGet:
+            port: 80
+            path: /
+          failureThreshold: 3
+          periodSeconds: 15
+
+        readinessProbe:
+          httpGet:
+            port: 80
+            path: /
+          failureThreshold: 3
+          periodSeconds: 15
+
+        startupProbe:
+          httpGet:
+            port: 80
+            path: /
+          failureThreshold: 3
+          periodSeconds: 15
+
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-pod

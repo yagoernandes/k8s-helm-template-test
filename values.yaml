@@ -1,0 +1,7 @@
+hostname: savewalter.transporte.denoxtest.com.br
+port: 80
+image: yagoernandes/savewalterwhite
+version: latest
+metrics: true
+env:
+  SEM_USO: "nao utilizada"
